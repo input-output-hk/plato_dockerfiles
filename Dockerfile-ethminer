@@ -1,0 +1,23 @@
+FROM ubuntu:16.04
+
+WORKDIR /miner
+
+RUN apt-get update \
+    && apt-get -y install software-properties-common \
+    && add-apt-repository -y ppa:ethereum/ethereum \
+    && apt-get update \
+    && apt-get install git cmake libcryptopp-dev libleveldb-dev libjsoncpp-dev libjsonrpccpp-dev libjsonrpccpp-tools libboost-all-dev libgmp-dev libreadline-dev libcurl4-gnutls-dev ocl-icd-libopencl1 opencl-headers mesa-common-dev libmicrohttpd-dev build-essential -y \
+    && apt-get clean
+
+RUN git clone https://github.com/Genoil/cpp-ethereum.git ethminer \
+    && cd ethminer \
+    && git checkout 108 \
+    && mkdir build \
+    && cd build \
+    && cmake -DBUNDLE=miner .. \
+    && cd ethminer \
+    && make
+
+WORKDIR /miner/ethminer/build/ethminer
+
+ENTRYPOINT ["sh", "-c", "./ethminer -C -F $ETH_CLIENT_IP:$RPC_PORT"]

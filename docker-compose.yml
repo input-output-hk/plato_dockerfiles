@@ -1,0 +1,28 @@
+version: '2'
+services:
+  mantis:
+    build: 
+      context: .
+      dockerfile: Dockerfile-mantis
+      args:
+        MANTIS_VERSION: ${MANTIS_VERSION}
+    volumes:
+      - ${DATADIR}:/datadir
+      - ${MANTIS_CONF}:/mantis/mantis-${MANTIS_VERSION}/conf
+    ports:
+     - "${RPC_PORT}:${RPC_PORT}"
+     - "9076:9076"
+    image: inputoutput/mantis:${MANTIS_VERSION}
+    environment:
+     - RPC_PORT=${RPC_PORT}
+     - MANTIS_VERSION=${MANTIS_VERSION}
+  ethminer:
+    build:
+      context: .
+      dockerfile: Dockerfile-ethminer
+    image: inputoutput/ethminer:cpu
+    environment:
+     - ETH_CLIENT_IP=mantis
+     - RPC_PORT=${RPC_PORT}
+    links:
+     - mantis
