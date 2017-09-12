@@ -46,6 +46,8 @@ mantis {
 }
 ```
 Replace the variables $NODE1_ID, $NODE1_IP, $NODE1_PORT, etc with the values that correspond.
+ 
+## Build your mantis image
 
 After this configuration, you can build the images using the command below:
 ``` 
