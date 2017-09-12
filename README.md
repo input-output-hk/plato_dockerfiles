@@ -10,7 +10,7 @@ In order to setup Mantis image you need to provide a bind volume that contains a
 
 _Note: Refer to [Mantis](http://mantis.readthedocs.io/en/latest/General-Configuration/) documentation in order to understand configuration parameters_
 
-- Create a file called `private-genesis.json` like this: (In order to allow nodes
+- Create a file called `private-genesis.json` into the folder `conf`, with a configuration like this: (In order to allow nodes
 to connected between them, they need to have this file with the same configuration)
 ```
 {
