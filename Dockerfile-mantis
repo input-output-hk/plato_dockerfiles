@@ -12,4 +12,4 @@ RUN export \
     && unzip mantis-$MANTIS_VERSION.zip
 
 WORKDIR mantis-$MANTIS_VERSION
-ENTRYPOINT ["sh", "-c", "./bin/mantis -J-Dmantis.network.rpc.port=$RPC_PORT -J-Dmantis.datadir=/datadir -J-Dmantis.blockchain.custom-genesis-file=/mantis/mantis-$MANTIS_VERSION/conf/private-genesis.json -J-Dmantis.network.rpc.interface=0.0.0.0 -J-Dmantis.network.server-address.interface=0.0.0.0"]
+ENTRYPOINT ["sh", "-c", "./bin/mantis -J-Dmantis.network.rpc.port=$RPC_PORT -J-Dmantis.datadir=/datadir -J-Dmantis.network.rpc.interface=0.0.0.0 -J-Dmantis.network.server-address.interface=0.0.0.0"]
