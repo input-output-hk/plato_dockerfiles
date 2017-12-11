@@ -1,25 +1,24 @@
 # Plato Image configuration:
 
-Here you will find the steps in order to startup a plato node based on:
-- Mantis client - https://github.com/input-output-hk/mantis
-- CPU Ethminer - https://github.com/Genoil/cpp-ethereum/tree/108
+Here you will find the steps in order to startup a Plato node based on:
+- Plato client (Mantis fork) - https://github.com/input-output-hk/plato
 
 ## Setup a private network:
 
-In order to setup Mantis image you need to provide a bind volume that contains a folder called `conf` with all the custom configuration related to Mantis.
+In order to setup Plato image you need to provide a bind volume that contains a folder called `conf` with all the custom configuration related to Plato private network.
 
-_Note: Refer to [Mantis](http://mantis.readthedocs.io/en/latest/General-Configuration/) documentation in order to understand configuration parameters_
+_Note: Refer to [Plato](https://github.com/input-output-hk/plato/wiki) documentation in order to understand configuration parameters_
 
 - Create a file called `private-genesis.json` into the folder `conf`, with a configuration like this: (In order to allow nodes
 to connected between them, they need to have this file with the same configuration)
 ```
 {
-  "extraData": "0x00",
+  "timestamp": "0x5a17174d",
+  "difficulty": "0x0400000000",
+  "gasLimit": "0x1388000000",
   "nonce": "0x0000000000000042",
-  "gasLimit": "0x2fefd8",
-  "difficulty": "0x400",
+  "extraData": "0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa",
   "ommersHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
-  "timestamp": "0x00",
   "coinbase": "0x0000000000000000000000000000000000000000",
   "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
   "alloc": {}
@@ -47,28 +46,41 @@ mantis {
 ```
 Replace the variables $NODE1_ID, $NODE1_IP, $NODE1_PORT, etc with the values that correspond.
  
-## Build your mantis image
+- In the existing file `ouroboros.conf` set the the accounts that will be part of the consensus algorithm:
+```
+mantis {
+  ouroboros {
+    slot-minerStakeHolders-mapping =
+      {
+        1:  ["edde8656c35fcb7126c61fc6e2673734425a72bf","240653414e3d40764a0fc75af372bb6458f8600a"]
+      }
+  }
+}
+```
+In the example we configure the wallets `0xedde8656c35fcb7126c61fc6e2673734425a72bf` and `0x240653414e3d40764a0fc75af372bb6458f8600a` as the set of authorities that can add new blocks from slot 1. For more info, check the Plato documentation section [Configuring Certification Authorities](https://github.com/input-output-hk/plato/wiki/Configuring-Certification-Authorities-(CAs))
+
+## Build your Plato image
 
 After this configuration, you can build the images using the command below:
 ``` 
-$ export MANTIS_VERSION="0.3-cli-beta"; export RPC_PORT=8545; export MANTIS_CONF=./conf; export DATADIR=./db-data; docker-compose up --build -d mantis
+$ export MANTIS_VERSION="0.6-cardano-enterprise-node"; export RPC_PORT=8545; export MANTIS_CONF=./conf; export DATADIR=./db-data; docker-compose up --build -d mantis
+
 ```
 As you can see from the command, you need to setup a couple of env variables:
-- MANTIS_VERSION: The [released version of mantis](https://github.com/input-output-hk/mantis/releases/tag/v0.3-cli-beta) (image used for download client)
+- MANTIS_VERSION: The [released version of plato](https://github.com/input-output-hk/plato/releases/tag/v0.6-cardano-enterprise-node)
 - RPC_PORT: The port that the node is going to expose
-- MANTIS_CONF: The path where the folder with the configuration files is located (you can get the initial files from a [distribution package](https://github.com/input-output-hk/mantis/releases/download/v0.3-cli-beta/mantis-0.3-cli-beta.zip), it is highly recommend that
+- MANTIS_CONF: The path where the folder with the configuration files is located (you can get the initial files from a [distribution package](https://github.com/input-output-hk/plato/archive/v0.6-cardano-enterprise-node.zip), it is highly recommend that
 the initial config files match the MANTIS_VERSION you previously defined). This is managed by the docker-compose as a binded volume.
 - DATADIR: A path to the folder that will contains the datadir, this is manage by the docker-compose as a binded volume too.
 
-## Configuring the miner:
+## Add a new certification authority to the node:
 
-After building the mantis image, you need to create an account for the miner. You can use a command like this: 
+If you want to add a certification authority. Previously you should have an account managed by your node. If you don't have an account you could use a command like this to create it: 
 ```
 curl -X POST \
-  http://127.0.0.1:$RPC_PORT/ \
+  http://$NODE_IP:$RPC_PORT/ \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/json' \
-  -H 'postman-token: 9b445681-1280-ccec-440f-ac5838df4686' \
   -d '{
     "jsonrpc": "2.0",
     "method": "personal_newAccount", 
@@ -76,64 +88,51 @@ curl -X POST \
     "id": 67
 }'
 ```
-Replace $RPC_PORT with the port you used after, and $ACCOUNT_PASSWORD with a secure secret password.
+Replace $NODE_IP with the ip of the node you want to managed the account and $RPC_PORT with the port you used after, and $ACCOUNT_PASSWORD with a secure secret password.
 The expected output is:
 ```
 {"jsonrpc":"2.0","result":"$NEW_ADDRESS","id":67}
 ```
 
-Then configure the files related to the miner.
+Then configure the file related to the certification authorities consensus. Please follow the documentation guide:
+[Configuring initial CAs](https://github.com/input-output-hk/plato/wiki/Configuring-Certification-Authorities-(CAs)#configuring-initial-cas)
 
-Highlight configuration files for setup for the ethminer:
-
-- In the existing file `sync.conf` set on regular sync.
+IMPORTANT: Take in count that any new authority implies a change in the current consensus algorithm (this is consider a hard fork), so in order to maintain consesus between all the network nodes, each node should configure the new certification authority in its settings, and be restarted in order to apply changes.
+After update the settings file you can restart the node:
 ```
-mantis {
-  sync {
-    # Whether to enable fast-sync
-    do-fast-sync = false
-    
-    ...
-  }
-}
+export MANTIS_VERSION="0.6-cardano-enterprise-node"; export RPC_PORT=8545; export MANTIS_CONF=./conf; export DATADIR=./db-data; docker-compose restart mantis
 ```
-
-- In the existing file `misc.conf`
+Unlock the new certification authority address:
 ```
-mantis {
-  ...
-
-  mining {
-    # Miner's coinbase address
-    coinbase = "$MINER_ADDRESS"
-  }
-
-  ...
-}
-```
-Replace $MINER_ADDRESS with the $NEW_ADDRESS created before.
-
-Now you can restart the service and then start the miner again:
-```
-$ docker-compose restart mantis
-
-$ export MANTIS_VERSION="0.3-cli-beta"; export RPC_PORT=8545; export MANTIS_CONF=./conf; export DATADIR=./db-data; docker-compose up --build -d ethminer
+curl -X POST \
+  "$NODE_IP:$NODE_JSON_RPC_PORT"/ \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -d '{ "jsonrpc": "2.0", "method": "personal_unlockMinerAccount", "params": ["$ADDRESS", "$PASSWORD"], "id": 1}'
 ```
 
-# Know issues:
+$NODE_IP:$NODE_JSON_RPC_PORT = Node IP and JSON-RPC port from the node that manage the account.
+$ADDRESS = Authority wallet address (without 0x prefix)
+$PASSWORD = *** (replace with your wallet password)
 
-- If you are using a hosting service, be sure that you have enough cpu power to do mining (If using Amazon EC2, computing oriented ones are suggested)
+# Troubleshooting:
 
-- If the miner takes too much time to start mining, follow this steps:
-```
-$ docker exec -it plato_ethminer_1 bash
-$ (container) ./ethminer -D 0
-```
-You should see `Initializing DAG for epoch beginning #0 (seedhash 00000000…). This will take a while.`
+## Locked certification authority
 
-Once that's finished, restart ethminer container:
-```
-export MANTIS_VERSION="0.3-cli-beta"; export RPC_PORT=8545; export MANTIS_CONF=./conf; export DATADIR=./db-data ; docker-compose restart ethminer
-```
+In order to check, using logs, if some of your certification authorities are locked you should follow the steps below:
 
-- If you are in a server connected by SSH and you close your session, when you re-connect, you must run the docker-compose commands re-exporting the env variables previously defined.
+- First if you are using a hosting service, enter via ssh to the instance.
+
+- Then execute the following command (pre-condition: Plato docker image should be running):
+
+$ docker exec -it platoiohk_mantis_1 bash
+
+- We can check if the there are some authority locked with the following command:
+
+$ grep "Unable to get block for mining, error: Error while generating block for mining: LockedMinerAccountError" mantis.log
+
+If you execute the command several times and the output constantly grows, it's probably some of the node certification authorities are locked.
+
+- In order to unlock them, follow the previous guide [Unlocking CA accounts](https://github.com/input-output-hk/plato/wiki/Configuring-Certification-Authorities-(CAs)#unlocking-ca-accounts)
+
+
