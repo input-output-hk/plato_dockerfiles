@@ -5,7 +5,7 @@ WORKDIR /mantis
 ARG MANTIS_VERSION
 
 RUN export \
-    && wget https://github.com//ntallar/mantis/releases/download/v$MANTIS_VERSION/mantis-$MANTIS_VERSION.zip \
+    && wget https://github.com/input-output-hk/plato/archive/v$MANTIS_VERSION/mantis-$MANTIS_VERSION.zip \
     && apt-get update \ 
     && apt-get install unzip \
     && apt-get clean \

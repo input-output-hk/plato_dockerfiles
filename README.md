@@ -111,9 +111,11 @@ curl -X POST \
   -d '{ "jsonrpc": "2.0", "method": "personal_unlockMinerAccount", "params": ["$ADDRESS", "$PASSWORD"], "id": 1}'
 ```
 
-$NODE_IP:$NODE_JSON_RPC_PORT = Node IP and JSON-RPC port from the node that manage the account.
-$ADDRESS = Authority wallet address (without 0x prefix)
-$PASSWORD = *** (replace with your wallet password)
+- $NODE_IP:$NODE_JSON_RPC_PORT = Node IP and JSON-RPC port from the node that manage the account.
+
+- $ADDRESS = Authority wallet address (without 0x prefix)
+
+- $PASSWORD = *** (replace with your wallet password)
 
 # Troubleshooting:
 
