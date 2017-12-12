@@ -63,13 +63,13 @@ In the example we configure the wallets `0xedde8656c35fcb7126c61fc6e2673734425a7
 
 After this configuration, you can build the images using the command below:
 ``` 
-$ export MANTIS_VERSION="0.6-cardano-enterprise-node"; export RPC_PORT=8545; export MANTIS_CONF=./conf; export DATADIR=./db-data; docker-compose up --build -d mantis
+$ export MANTIS_VERSION="0.7"; export RPC_PORT=8545; export MANTIS_CONF=./conf; export DATADIR=./db-data; docker-compose up --build -d mantis
 
 ```
 As you can see from the command, you need to setup a couple of env variables:
-- MANTIS_VERSION: The [released version of plato](https://github.com/input-output-hk/plato/releases/tag/v0.6-cardano-enterprise-node)
+- MANTIS_VERSION: The [released version of plato](https://github.com/input-output-hk/plato/releases/tag/v0.7-plato)
 - RPC_PORT: The port that the node is going to expose
-- MANTIS_CONF: The path where the folder with the configuration files is located (you can get the initial files from a [distribution package](https://github.com/input-output-hk/plato/archive/v0.6-cardano-enterprise-node.zip), it is highly recommend that
+- MANTIS_CONF: The path where the folder with the configuration files is located (you can get the initial files from a [distribution package](https://github.com/input-output-hk/plato/releases/download/v0.7-plato/plato-0.7.zip), it is highly recommend that
 the initial config files match the MANTIS_VERSION you previously defined). This is managed by the docker-compose as a binded volume.
 - DATADIR: A path to the folder that will contains the datadir, this is manage by the docker-compose as a binded volume too.
 
@@ -100,7 +100,7 @@ Then configure the file related to the certification authorities consensus. Plea
 IMPORTANT: Take in count that any new authority implies a change in the current consensus algorithm (this is consider a hard fork), so in order to maintain consesus between all the network nodes, each node should configure the new certification authority in its settings, and be restarted in order to apply changes.
 After update the settings file you can restart the node:
 ```
-export MANTIS_VERSION="0.6-cardano-enterprise-node"; export RPC_PORT=8545; export MANTIS_CONF=./conf; export DATADIR=./db-data; docker-compose restart mantis
+export MANTIS_VERSION="0.7"; export RPC_PORT=8545; export MANTIS_CONF=./conf; export DATADIR=./db-data; docker-compose restart mantis
 ```
 Unlock the new certification authority address:
 ```

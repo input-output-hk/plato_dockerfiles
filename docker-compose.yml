@@ -8,7 +8,7 @@ services:
         MANTIS_VERSION: ${MANTIS_VERSION}
     volumes:
       - ${DATADIR}:/datadir
-      - ${MANTIS_CONF}:/mantis/mantis-${MANTIS_VERSION}/conf
+      - ${MANTIS_CONF}:/mantis/plato-${MANTIS_VERSION}/conf
     ports:
      - "${RPC_PORT}:${RPC_PORT}"
      - "9076:9076"
