@@ -135,6 +135,6 @@ $ grep "Unable to get block for mining, error: Error while generating block for 
 
 If you execute the command several times and the output constantly grows, it's probably some of the node certification authorities are locked.
 
-- In order to unlock them, follow the previous guide [Unlocking CA accounts](https://github.com/input-output-hk/plato/wiki/Configuring-Certification-Authorities-(CAs)#unlocking-ca-accounts)
+- In order to unlock them, follow the previous guide [Unlocking CA accounts](https://github.com/input-output-hk/plato/wiki/Unlocking-CA-accounts)
 
 
